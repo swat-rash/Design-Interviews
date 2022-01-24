@@ -1,111 +1,140 @@
-import
+// Non-tested code
+class Vehicle{
+    String license;
+    int type;
+    
+    Vehicle(int license, int type){
+        this.license = license;
+        this.type = type;
+    }
+}
 
-public class Main{
-    public static void main(String[] args)(
-        ParkingLot lot = new ParkingLot(10);
-        Plane planeA = new Plane("AirIndia", "A", -1);
-        Plane planeB = new Plane("Indigo", "I", -1);
-        lot.tryLand(planeA);
-        lot.tryLand(planeB);
-    )
+class Truck extends Vehicle{
+    
+    Truck(int license, int type){
+        super(license, type);
+    }
+}
+
+class Car extends Vehicle{
+    Car(int license, int type){
+       super(license, type);
+    }
+}
+
+class SUV extends Vehicle{
+    
+    SUV(int license, int type){
+        super(license, type);
+    }
+}
+
+class ParkingSpot extends Spot{
+    
+    int type;
+    
+    ParkingSpot(int type, int level, int number){
+        this.type  = type;
+        super(level, number);
+    }
+}
+
+class Spot{
+    int level;
+    int number;
+    
+    Spot(int level, int number){
+        this.level = level;
+        this.number = number;
+    }
 }
 
 class ParkingLot{
-    Semaphore sem;
-    ParkingSpace[] parkingSpaces;
-    int n;
-    List<Plane> registeredPlanes;
     
-    ParkingLot(int n){
-        sem = new Semaphore(1);
-        this.n = n;
-        this.registeredPlanes = new LinkedList≤≥();
-        for(int i = 1; i <= n; i++)
-            parkingSpaces[i] = new ParkingSpace(i, null);
-    }
-    
-    void Register(Plane Plane) {
-        this.registeredPlanes.add(plane);
-    }
-    
-    // TODO
-    void Unregister(Plane Plane) {
-        this.registeredPlanes.add(plane);
-    }
-    
-    void Empty(Plane plane) {
-        sem.acquire();
-        for (int i = 1; i <= n; i++) {
-            if (parkingSpaces[i].plane == plane)
-                parkingSpaces[i] = null;
-        }
-        sem.release();
-        
-        for (int i = 0; i < registeredPlanes.size(); i++) {
-            registeredPlanes[i].OnShouldLand();
-        }
-    }
-    
-    ParkingSpace tryLand(Plane plane){
-        ParkingSpace space = null;
-        sem.acquire();
-        for(int i = 1; i <= n; i++){
-            if(parkingSpace[i] == null){
-                space = parkingSpace[i];  
+    ParkingSpot[][] parkingSpots;
+    Comparator cmpSpot;
+
+    ParkingLot(int level, int num){
+        this.parkingSpots = new ParkingSpot[level][num];
+        cmpSpot = new Comparator<Spot>(){
+        public int compare(Spot a, Spot b){
+            if(a.level == b.level){
+                return a.number - b.number;
             }
+            return a.level - b.level;
         }
-        sem.release();
-        if(space == null)
-            System.out.println("No parking space available for flight: " + plane.flightNum);
-        else
-            System.out.println("Parking space available for flight: " + plane.flightNum + " " + i);
-        return space;
-    }
-}
-
-class ParkingSpace{
-    
-    int parkingNum;
-    Plane plane;
-    
-    ParkingSpace(int parkingNum, Plane plane){
-        this.parkingNum = parkingNum;
-        this.plane = plane;
-    }
-    
-    
-}
-
-class Plane{
-    String airline;
-    int flightNum;
-    ParkingLot parkingLot;
-    boolean hasLanded;
-    
-    Plane(String airline, int flightNum, ParkingLot parkingLot){
-        this.airline = airline;
-        this.flightNum = flightNum;
-        this.parkingNum = parkingNum;
-        this.parkingLot = parkingLot;
+    };
         
-        this.parkingLot.register(this);
     }
-    
-    Land () {
-        if ()
-    }
-    
-    void OnShouldLand() {
-        if (this.parkingLot.tryLand(this)) {
-            this.OnLanded();
+    create(){
+        for(int i = 0; i < 3; i++){ 
+            for(int j = 0; j < 6; j++)
+                parkingSpots[i][j] = new parkingSpot(1, i, j);
+            for(int j = 6; j < 9; j++)
+                parkingSpots[i][j] = new parkingSpot(2, i, j);
+            for(int j = 9; j < 10; j++)
+                parkingSpots[i][j] = new parkingSpot(3, i, j);
         }
     }
     
-    void OnLanded() {
-        this.parkingLot.Unregister(plane);
+}
+
+class ParkingSystem{
+    
+    ParkingLot lot;
+    Map<Vehicle, Spot> parkedMappings;
+    PriorityQueue<Spot> minHeapC;
+    PriorityQueue<Spot> minHeapT;
+    PriorityQueue<Spot> minHeapS;
+    
+    ParkingSystem(ParkingLot lot, Comparator<Spot> cmp){
+        this.lot = lot;
+        this.parkedMappings = new HashMap<>();
+        minHeapC = new PriorityQueue<Spot>(cmp);
+        minHeapT = new PriorityQueue<Spot>(cmp);
+        minHeapS = new PriorityQueue<Spot>(cmp);
     }
     
-    void Leave() {
-        this.parkingLot.Empty(this);
+    void park(Vehicle v){
+        Spot spot = null;
+        if(v.type == 1)
+            spot = minHeapC.poll();
+        if(v.type == 2)
+            spot = minHeapS.poll();
+        if(v.type == 3)
+           spot = minHeapT.poll();
+        map.put(v, spot);
     }
+    
+    void unpark(Vehicle v){
+        ParkingSpot spot = parkedMappings.get(v);
+        if(spot != null){
+            if(v.type == 1)
+                minHeapC.add(spot);
+            if(v.type == 2)
+                minHeapS.add(spot);
+            if(v.type == 3)
+                minHeapT.add(spot);
+            map.remove(spot);
+        }else
+            System.out.println("Car not parked");
+    }
+}
+
+class Main{
+    
+    public static void main(String[] args) {
+        Vehicle car = new Car("CAR", 1);
+        Vehicle suv = new Car("SUV", 2);
+        Vehicle truck = new Car("TRUCK", 3);
+        
+        ParkingLot lot = new ParkingLot();
+        lot.create();
+        ParkingSystem ps = new ParkingSystem(lot.parkingSpots, );
+        ps.park(car);
+        ps.park(suv);
+        ps.park(truck);
+        ps.unpark(car);
+    }
+    
 }
